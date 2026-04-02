@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>風水師個人網站產生器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --ink: #0f0c07;
+    --ink-mid: #1e1810;
+    --parchment: #f7f0e3;
+    --red: #8b1a1a;
+    --step-active: #c9a84c;
+    --step-done: #4a7c59;
+    --accent: #c9a84c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: #f4f0e8;
+    color: #2d2416;
+    min-height: 100vh;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--ink);
+    border-bottom: 2px solid var(--gold);
+    padding: 16px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar-logo {
+    font-family: 'Noto Serif TC', serif;
+    color: var(--gold); font-size: 1.1rem; letter-spacing: 0.2em;
+  }
+  .topbar-sub { color: rgba(245,232,192,0.4); font-size: 0.75rem; letter-spacing: 0.2em; }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* ── SIDEBAR STEPS ── */
+  .sidebar {
+    background: var(--ink-mid);
+    padding: 40px 28px;
+    border-right: 1px solid rgba(201,168,76,0.2);
+    position: sticky; top: 0; height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+
+  .sidebar-title {
+    font-family: 'Noto Serif TC', serif;
+    color: var(--gold); font-size: 0.8rem;
+    letter-spacing: 0.35em; margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .step-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 16px; margin-bottom: 4px;
+    cursor: pointer; border-radius: 4px;
+    transition: background 0.2s;
+    border: 1px solid transparent;
+  }
+  .step-item:hover { background: rgba(201,168,76,0.06); border-color: rgba(201,168,76,0.15); }
+  .step-item.active { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.3); }
+  .step-item.done .step-dot { background: var(--step-done); border-color: var(--step-done); }
+  .step-item.done .step-dot::after { content: '✓'; color: white; font-size: 0.65rem; }
+
+  .step-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1.5px solid rgba(201,168,76,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; color: rgba(245,232,192,0.5);
+    flex-shrink: 0; transition: all 0.3s;
+  }
+  .step-item.active .step-dot { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.15); }
+
+  .step-text strong {
+    display: block; color: rgba(245,232,192,0.85);
+    font-size: 0.85rem; margin-bottom: 2px;
+  }
+  .step-text span { color: rgba(245,232,192,0.35); font-size: 0.72rem; }
+
+  .sidebar-progress {
+    margin-top: 32px; padding-top: 24px;
+    border-top: 1px solid rgba(201,168,76,0.15);
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    color: rgba(245,232,192,0.4); font-size: 0.72rem; letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 3px; background: rgba(201,168,76,0.15); border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--gold);
+    transition: width 0.5s; width: 0%;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    padding: 48px 56px;
+    overflow-y: auto;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .panel-header { margin-bottom: 40px; }
+  .panel-tag {
+    display: inline-block;
+    font-size: 0.68rem; letter-spacing: 0.4em; color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 5px 16px; margin-bottom: 12px;
+  }
+  .panel-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.6rem; color: var(--ink);
+    letter-spacing: 0.05em; margin-bottom: 8px;
+  }
+  .panel-desc { color: #6b5a3e; font-size: 0.85rem; line-height: 1.8; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-full { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label {
+    font-size: 0.75rem; letter-spacing: 0.25em; color: var(--gold);
+    font-weight: 500;
+  }
+  .field .hint { font-size: 0.7rem; color: #9b8a6a; margin-top: -3px; }
+
+  .field input[type=text],
+  .field input[type=tel],
+  .field input[type=email],
+  .field textarea,
+  .field select {
+    background: white;
+    border: 1.5px solid #d4c9b0;
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.88rem;
+    color: var(--ink);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .field input:focus,
+  .field textarea:focus,
+  .field select:focus { border-color: var(--gold); }
+  .field textarea { resize: vertical; min-height: 100px; }
+
+  /* ── THEME PICKER ── */
+  .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .theme-card {
+    border: 2px solid #d4c9b0;
+    border-radius: 8px; overflow: hidden; cursor: pointer;
+    transition: all 0.25s; position: relative;
+  }
+  .theme-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .theme-card.selected { border-color: var(--gold); }
+  .theme-card.selected::after {
+    content: '✓ 已選';
+    position: absolute; top: 8px; right: 8px;
+    background: var(--gold); color: var(--ink);
+    font-size: 0.65rem; letter-spacing: 0.1em;
+    padding: 3px 10px; border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .theme-preview {
+    height: 100px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; flex-direction: column; gap: 6px;
+  }
+  .theme-preview.classic { background: linear-gradient(135deg, #0f0c07, #2d2416); }
+  .theme-preview.modern { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+  .theme-preview.zen { background: linear-gradient(135deg, #2d4a22, #4a6741); }
+
+  .theme-info { padding: 14px 16px; background: white; }
+  .theme-name { font-size: 0.9rem; font-weight: 500; color: #2d2416; margin-bottom: 4px; }
+  .theme-desc { font-size: 0.72rem; color: #6b5a3e; }
+
+  /* ── MODULE PICKER ── */
+  .module-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+  .module-toggle {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 18px;
+    background: white; border: 1.5px solid #d4c9b0;
+    border-radius: 6px; cursor: pointer; transition: all 0.2s;
+  }
+  .module-toggle:hover { border-color: var(--gold); background: #fffdf8; }
+  .module-toggle.enabled { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+
+  .toggle-box {
+    width: 22px; height: 22px; border-radius: 4px;
+    border: 1.5px solid #d4c9b0; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .module-toggle.enabled .toggle-box { background: var(--gold); border-color: var(--gold); color: white; font-size: 0.75rem; }
+
+  .module-text strong { display: block; font-size: 0.88rem; color: #2d2416; margin-bottom: 2px; }
+  .module-text span { font-size: 0.72rem; color: #9b8a6a; }
+
+  .module-badge {
+    margin-left: auto; font-size: 0.62rem; padding: 3px 10px;
+    border-radius: 20px; flex-shrink: 0;
+  }
+  .module-badge.required { background: #fff0f0; color: var(--red); border: 1px solid rgba(139,26,26,0.3); }
+  .module-badge.revenue { background: rgba(201,168,76,0.15); color: #7a5a1a; border: 1px solid rgba(201,168,76,0.4); }
+
+  /* ── PHOTO UPLOAD ── */
+  .upload-zone {
+    border: 2px dashed #d4c9b0;
+    border-radius: 8px; padding: 48px;
+    text-align: center; cursor: pointer;
+    transition: all 0.25s; background: white;
+  }
+  .upload-zone:hover { border-color: var(--gold); background: #fffdf8; }
+  .upload-zone p { color: #9b8a6a; font-size: 0.85rem; margin-top: 12px; }
+  .upload-zone strong { color: var(--gold); }
+  #photo-preview {
+    width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--gold); margin: 0 auto 12px; display: none;
+  }
+  #photo-preview.visible { display: block; }
+
+  /* ── GENERATE BUTTON ── */
+  .generate-area {
+    background: var(--ink);
+    border-radius: 8px; padding: 40px;
+    text-align: center; margin-top: 20px;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .generate-area p {
+    color: rgba(245,232,192,0.5); font-size: 0.82rem;
+    letter-spacing: 0.1em; margin-bottom: 24px;
+  }
+
+  .btn-generate {
+    display: inline-block; padding: 16px 56px;
+    background: var(--gold); color: var(--ink);
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1rem; letter-spacing: 0.25em;
+    font-weight: 600; border: none; cursor: pointer;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    transition: all 0.3s;
+  }
+  .btn-generate:hover {
+    background: var(--gold-light);
+    box-shadow: 0 8px 32px rgba(201,168,76,0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-next {
+    margin-top: 32px; padding: 12px 36px;
+    background: var(--gold); color: var(--ink);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.85rem; letter-spacing: 0.2em;
+    font-weight: 500; border: none; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-next:hover { background: var(--gold-light); }
+
+  .btn-back {
+    margin-top: 32px; margin-right: 12px; padding: 11px 28px;
+    background: transparent; color: var(--gold);
+    border: 1px solid var(--gold);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.85rem; letter-spacing: 0.15em;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-back:hover { background: rgba(201,168,76,0.1); }
+
+  /* ── SUCCESS ── */
+  .success-box {
+    background: var(--ink-mid); border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px; padding: 48px; text-align: center; margin-top: 24px;
+    display: none;
+  }
+  .success-box.visible { display: block; }
+  .success-icon { font-size: 3rem; margin-bottom: 20px; }
+  .success-box h3 {
+    font-family: 'Noto Serif TC', serif;
+    color: var(--gold); font-size: 1.4rem; letter-spacing: 0.1em; margin-bottom: 16px;
+  }
+  .success-box p { color: rgba(245,232,192,0.6); font-size: 0.85rem; line-height: 1.9; }
+
+  .download-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+
+  .btn-dl {
+    padding: 12px 28px; cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.85rem; letter-spacing: 0.15em; border: none;
+    transition: all 0.2s;
+  }
+  .btn-dl.primary { background: var(--gold); color: var(--ink); font-weight: 600; }
+  .btn-dl.primary:hover { background: var(--gold-light); }
+  .btn-dl.secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-dl.secondary:hover { background: rgba(201,168,76,0.1); }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    border: none; border-top: 1px solid #d4c9b0;
+    margin: 32px 0;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; display: flex; flex-wrap: wrap; gap: 8px; padding: 20px; }
+    .main { padding: 32px 20px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .theme-grid { grid-template-columns: 1fr; }
+    .module-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-logo">✦ 風水師個人網站產生器</div>
+    <div class="topbar-sub">FENGSHUI MASTER WEBSITE BUILDER</div>
+  </div>
+  <div style="color:rgba(245,232,192,0.3);font-size:0.72rem;letter-spacing:0.2em">免費建站 · 一鍵下載 · GitHub Pages</div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">建站步驟</div>
+
+    <div class="step-item active" data-step="0" onclick="goStep(0)">
+      <div class="step-dot">1</div>
+      <div class="step-text"><strong>基本資料</strong><span>姓名、電話、地址</span></div>
+    </div>
+    <div class="step-item" data-step="1" onclick="goStep(1)">
+      <div class="step-dot">2</div>
+      <div class="step-text"><strong>個人簡介</strong><span>資歷、經歷、統計</span></div>
+    </div>
+    <div class="step-item" data-step="2" onclick="goStep(2)">
+      <div class="step-dot">3</div>
+      <div class="step-text"><strong>服務項目</strong><span>最多六項服務</span></div>
+    </div>
+    <div class="step-item" data-step="3" onclick="goStep(3)">
+      <div class="step-dot">4</div>
+      <div class="step-text"><strong>選擇主題</strong><span>古典、現代、禪意</span></div>
+    </div>
+    <div class="step-item" data-step="4" onclick="goStep(4)">
+      <div class="step-dot">5</div>
+      <div class="step-text"><strong>選擇模組</strong><span>自訂頁面區塊</span></div>
+    </div>
+    <div class="step-item" data-step="5" onclick="goStep(5)">
+      <div class="step-dot">6</div>
+      <div class="step-text"><strong>產生網站</strong><span>下載 ZIP 檔案</span></div>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="progress-label">
+        <span>完成進度</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN PANELS -->
+  <main class="main">
+
+    <!-- STEP 0: 基本資料 -->
+    <div class="panel active" id="panel-0">
+      <div class="panel-header">
+        <span class="panel-tag">STEP 1</span>
+        <h2 class="panel-title">基本資料</h2>
+        <p class="panel-desc">填入大師的基本資訊，將顯示於網站首頁、頁尾及聯絡頁面。</p>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>大師姓名（稱謂）</label>
+          <input type="text" id="masterName" placeholder="例：諸葛玄機、李大師、王老師">
+          <span class="hint">顯示於首頁大標題</span>
+        </div>
+        <div class="field">
+          <label>館名 / 事務所名稱</label>
+          <input type="text" id="hallName" placeholder="例：玄機命理館、XX風水顧問">
+        </div>
+        <div class="field">
+          <label>副標題 / 專業描述</label>
+          <input type="text" id="subtitle" placeholder="例：風水命理 · 擇日開運 · 陽宅鑑定">
+          <span class="hint">顯示於名字下方</span>
+        </div>
+        <div class="field">
+          <label>首頁標語（一句話）</label>
+          <input type="text" id="tagline" placeholder="例：三十年閱地無數，為您點亮人生格局">
+        </div>
+        <div class="field">
+          <label>聯絡電話</label>
+          <input type="tel" id="phone" placeholder="09XX-XXX-XXX">
+        </div>
+        <div class="field">
+          <label>LINE ID</label>
+          <input type="text" id="lineId" placeholder="@your-line-id">
+        </div>
+        <div class="field form-full">
+          <label>服務地址</label>
+          <input type="text" id="address" placeholder="例：台北市大安區忠孝東路四段XX號XX樓（近忠孝敦化站）">
+        </div>
+        <div class="field">
+          <label>服務時間</label>
+          <input type="text" id="hours" placeholder="例：週一至週六 10:00-18:00">
+        </div>
+        <div class="field">
+          <label>協會認證（選填）</label>
+          <input type="text" id="cert" placeholder="例：中華民國地理師協會認證">
+        </div>
+      </div>
+
+      <button class="btn-next" onclick="nextStep()">下一步：個人簡介 →</button>
+    </div>
+
+    <!-- STEP 1: 個人簡介 -->
+    <div class="panel" id="panel-1">
+      <div class="panel-header">
+        <span class="panel-tag">STEP 2</span>
+        <h2 class="panel-title">個人簡介</h2>
+        <p class="panel-desc">介紹大師的學習背景、執業經歷與資歷數據，建立專業信任感。</p>
+      </div>
+
+      <div class="upload-zone" onclick="document.getElementById('photo-input').click()">
+        <img id="photo-preview" src="" alt="大師照片">
+        <div>
+          <div style="font-size:2.5rem">📷</div>
+          <p><strong>點擊上傳大師照片</strong><br>建議使用正式半身照，JPG/PNG 格式</p>
+        </div>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+
+      <hr class="section-divider">
+
+      <div class="form-grid">
+        <div class="field form-full">
+          <label>簡介段落一（學習背景）</label>
+          <textarea id="bio1" placeholder="例：自幼隨祖父習學堪輿之術，深研《地理正宗》、《撼龍經》等古籍，融合現代建築與環境科學，自成一派..."></textarea>
+        </div>
+        <div class="field form-full">
+          <label>簡介段落二（現況資歷）</label>
+          <textarea id="bio2" placeholder="例：現任中華民國地理師協會理事，長期開班授課，致力將正統堪輿知識傳承推廣..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-grid form-grid-3">
+        <div class="field">
+          <label>成就數字 1</label>
+          <input type="text" id="stat1num" placeholder="1,200+">
+          <input type="text" id="stat1label" placeholder="勘察案例" style="margin-top:8px">
+        </div>
+        <div class="field">
+          <label>成就數字 2</label>
+          <input type="text" id="stat2num" placeholder="30+">
+          <input type="text" id="stat2label" placeholder="執業年資" style="margin-top:8px">
+        </div>
+        <div class="field">
+          <label>成就數字 3</label>
+          <input type="text" id="stat3num" placeholder="98%">
+          <input type="text" id="stat3label" placeholder="客戶滿意度" style="margin-top:8px">
+        </div>
+      </div>
+
+      <button class="btn-back" onclick="prevStep()">← 上一步</button>
+      <button class="btn-next" onclick="nextStep()">下一步：服務項目 →</button>
+    </div>
+
+    <!-- STEP 2: 服務項目 -->
+    <div class="panel" id="panel-2">
+      <div class="panel-header">
+        <span class="panel-tag">STEP 3</span>
+        <h2 class="panel-title">服務項目</h2>
+        <p class="panel-desc">填入大師提供的服務（最多六項）。項目名稱留空則不顯示該項。</p>
+      </div>
+
+      <div id="services-form"></div>
+
+      <button class="btn-back" onclick="prevStep()">← 上一步</button>
+      <button class="btn-next" onclick="nextStep()">下一步：選擇主題 →</button>
+    </div>
+
+    <!-- STEP 3: 主題 -->
+    <div class="panel" id="panel-3">
+      <div class="panel-header">
+        <span class="panel-tag">STEP 4</span>
+        <h2 class="panel-title">選擇網站主題</h2>
+        <p class="panel-desc">選擇符合大師風格的視覺主題，後續可隨時更換。</p>
+      </div>
+
+      <div class="theme-grid">
+        <div class="theme-card selected" data-theme="classic" onclick="selectTheme('classic')">
+          <div class="theme-preview classic">
+            <span>🏯</span>
+            <span style="color:#c9a84c;font-size:0.8rem;letter-spacing:0.2em">古典傳統</span>
+          </div>
+          <div class="theme-info">
+            <div class="theme-name">古典傳統風</div>
+            <div class="theme-desc">墨黑金紅 · 水墨感 · 莊重大氣<br>適合傳統取向、資深大師</div>
+          </div>
+        </div>
+
+        <div class="theme-card" data-theme="modern" onclick="selectTheme('modern')">
+          <div class="theme-preview modern">
+            <span>🏙️</span>
+            <span style="color:#7ec8e3;font-size:0.8rem;letter-spacing:0.2em">現代專業</span>
+          </div>
+          <div class="theme-info">
+            <div class="theme-name">現代專業風</div>
+            <div class="theme-desc">深藍白色 · 簡潔有力 · 科技感<br>適合都會客群、年輕大師</div>
+          </div>
+        </div>
+
+        <div class="theme-card" data-theme="zen" onclick="selectTheme('zen')">
+          <div class="theme-preview zen">
+            <span>🍃</span>
+            <span style="color:#a8d5a2;font-size:0.8rem;letter-spacing:0.2em">禪意自然</span>
+          </div>
+          <div class="theme-info">
+            <div class="theme-name">禪意自然風</div>
+            <div class="theme-desc">原木綠意 · 柔和舒緩 · 自然感<br>適合療癒取向、重視氣場大師</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-back" onclick="prevStep()">← 上一步</button>
+      <button class="btn-next" onclick="nextStep()">下一步：選擇模組 →</button>
+    </div>
+
+    <!-- STEP 4: 模組 -->
+    <div class="panel" id="panel-4">
+      <div class="panel-header">
+        <span class="panel-tag">STEP 5</span>
+        <h2 class="panel-title">選擇網頁模組</h2>
+        <p class="panel-desc">勾選要顯示的區塊。標示「必選」的是基礎區塊；「收益模組」是風水能量儀產品區。</p>
+      </div>
+
+      <div class="module-grid">
+        <div class="module-toggle enabled" data-module="hero" onclick="toggleModule(this)">
+          <div class="toggle-box">✓</div>
+          <div class="module-text"><strong>🏮 首頁英雄區</strong><span>大名、標語、按鈕</span></div>
+          <span class="module-badge required">必選</span>
+        </div>
+        <div class="module-toggle enabled" data-module="about" onclick="toggleModule(this)">
+          <div class="toggle-box">✓</div>
+          <div class="module-text"><strong>👤 個人簡介區</strong><span>照片、資歷、統計數字</span></div>
+          <span class="module-badge required">必選</span>
+        </div>
+        <div class="module-toggle enabled" data-module="services" onclick="toggleModule(this)">
+          <div class="toggle-box">✓</div>
+          <div class="module-text"><strong>📋 服務項目區</strong><span>服務卡片展示</span></div>
+          <span class="module-badge required">必選</span>
+        </div>
+        <div class="module-toggle enabled" data-module="product" onclick="toggleModule(this)">
+          <div class="toggle-box">✓</div>
+          <div class="module-text"><strong>🔮 風水能量儀</strong><span>產品展示、購買按鈕</span></div>
+          <span class="module-badge revenue">收益模組</span>
+        </div>
+        <div class="module-toggle enabled" data-module="contact" onclick="toggleModule(this)">
+          <div class="toggle-box">✓</div>
+          <div class="module-text"><strong>📩 聯絡留言板</strong><span>表單 + 聯絡資訊</span></div>
+          <span class="module-badge required">必選</span>
+        </div>
+        <div class="module-toggle" data-module="testimonial" onclick="toggleModule(this)">
+          <div class="toggle-box"></div>
+          <div class="module-text"><strong>⭐ 客戶見證區</strong><span>口碑評價展示</span></div>
+        </div>
+        <div class="module-toggle" data-module="gallery" onclick="toggleModule(this)">
+          <div class="toggle-box"></div>
+          <div class="module-text"><strong>🖼️ 案例作品集</strong><span>圖片展示區塊</span></div>
+        </div>
+        <div class="module-toggle" data-module="map" onclick="toggleModule(this)">
+          <div class="toggle-box"></div>
+          <div class="module-text"><strong>🗺️ Google 地圖</strong><span>嵌入地圖導航</span></div>
+        </div>
+      </div>
+
+      <button class="btn-back" onclick="prevStep()">← 上一步</button>
+      <button class="btn-next" onclick="nextStep()">下一步：產生網站 →</button>
+    </div>
+
+    <!-- STEP 5: 產生 -->
+    <div class="panel" id="panel-5">
+      <div class="panel-header">
+        <span class="panel-tag">STEP 6</span>
+        <h2 class="panel-title">產生並下載網站</h2>
+        <p class="panel-desc">確認資料無誤後，點擊下方按鈕產生完整網站檔案，可直接上傳至 GitHub Pages。</p>
+      </div>
+
+      <div id="summary-box" style="background:white;border:1.5px solid #d4c9b0;border-radius:8px;padding:28px;margin-bottom:24px"></div>
+
+      <div class="generate-area">
+        <p>✦ 網站將產生為單一 HTML 檔案，零依賴、可直接部署 ✦</p>
+        <button class="btn-generate" onclick="generateSite()">⚡ 立即產生並下載網站</button>
+      </div>
+
+      <div class="success-box" id="success-box">
+        <div class="success-icon">🎉</div>
+        <h3>網站已成功產生！</h3>
+        <p>
+          檔案已下載至您的電腦。<br>
+          將 <strong style="color:var(--gold)">index.html</strong> 上傳至 GitHub Repository，<br>
+          在 Settings → Pages 開啟 GitHub Pages 即可上線。
+        </p>
+        <div class="download-btns">
+          <button class="btn-dl primary" onclick="generateSite()">⬇ 再次下載</button>
+          <button class="btn-dl secondary" onclick="goStep(0)">✎ 修改資料</button>
+        </div>
+        <p style="margin-top:20px;font-size:0.72rem;color:rgba(255,255,255,0.25)">
+          如需協助上傳 GitHub，請聯繫技術支援
+        </p>
+      </div>
+
+      <button class="btn-back" onclick="prevStep()">← 上一步</button>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── STATE ──
+let currentStep = 0;
+const totalSteps = 6;
+let selectedTheme = 'classic';
+let photoDataURL = '';
+
+const defaultServices = [
+  { icon: '🏠', name: '陽宅風水鑑定', desc: '住宅、辦公室、廠房等空間勘察，格局分析、化煞佈局，打造旺氣聚財的居住環境。' },
+  { icon: '📿', name: '八字命盤批算', desc: '依出生年月日時推算個人命盤，分析財運、事業、感情走勢，提供未來運勢規劃。' },
+  { icon: '📅', name: '擇日開運服務', desc: '婚禮、開幕、動土、安床等重要日期精選，配合個人八字擇取最吉利時辰。' },
+  { icon: '🧧', name: '姓名學鑑定', desc: '依三才五格理論分析姓名吉凶，為新生兒命名或成人改名，文字筆劃與命格相輔。' },
+  { icon: '🏢', name: '店面開業佈局', desc: '商業空間風水規劃，收銀台方位、神明廳設置、文昌位利用，助您生意興隆。' },
+  { icon: '🌐', name: '線上視訊鑑定', desc: '無法親赴現場者，可透過照片與視訊進行遠端鑑定，全台服務不受地域限制。' }
+];
+
+// ── BUILD SERVICES FORM ──
+function buildServicesForm() {
+  const container = document.getElementById('services-form');
+  container.innerHTML = '';
+  defaultServices.forEach((svc, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'background:white;border:1.5px solid #d4c9b0;border-radius:8px;padding:20px 24px;margin-bottom:16px';
+    div.innerHTML = `
+      <div style="font-weight:500;color:#2d2416;margin-bottom:14px;font-size:0.88rem">
+        服務 ${i+1} ${i < 3 ? '<span style="font-size:0.7rem;background:#fff0f0;color:#8b1a1a;padding:2px 10px;border-radius:20px;margin-left:8px">建議保留</span>' : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:12px">
+        <div class="field"><label>圖示</label><input type="text" id="svc${i}icon" value="${svc.icon}" style="text-align:center;font-size:1.2rem"></div>
+        <div class="field"><label>服務名稱</label><input type="text" id="svc${i}name" value="${svc.name}" placeholder="留空則跳過此項"></div>
+        <div class="field" style="grid-column:span 1"></div>
+        <div class="field" style="grid-column:1/-1"><label>服務說明</label><textarea id="svc${i}desc" rows="2">${svc.desc}</textarea></div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+buildServicesForm();
+
+// ── NAVIGATION ──
+function goStep(n) {
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i === n));
+  document.querySelectorAll('.step-item').forEach((s,i) => {
+    s.classList.remove('active');
+    if (i === n) s.classList.add('active');
+    if (i < n) s.classList.add('done'); else s.classList.remove('done');
+  });
+  currentStep = n;
+  const pct = Math.round((n / (totalSteps - 1)) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  if (n === totalSteps - 1) buildSummary();
+}
+
+function nextStep() { if (currentStep < totalSteps - 1) goStep(currentStep + 1); }
+function prevStep() { if (currentStep > 0) goStep(currentStep - 1); }
+
+// ── PHOTO PREVIEW ──
+function previewPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoDataURL = e.target.result;
+    const img = document.getElementById('photo-preview');
+    img.src = photoDataURL; img.classList.add('visible');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── THEME ──
+function selectTheme(theme) {
+  selectedTheme = theme;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`[data-theme="${theme}"]`).classList.add('selected');
+}
+
+// ── MODULES ──
+function toggleModule(el) {
+  const badge = el.querySelector('.module-badge');
+  if (badge && badge.classList.contains('required')) return;
+  el.classList.toggle('enabled');
+  const box = el.querySelector('.toggle-box');
+  box.textContent = el.classList.contains('enabled') ? '✓' : '';
+}
+
+function isModuleEnabled(name) {
+  const el = document.querySelector(`[data-module="${name}"]`);
+  return el && el.classList.contains('enabled');
+}
+
+// ── SUMMARY ──
+function buildSummary() {
+  const name = v('masterName') || '（未填姓名）';
+  const hall = v('hallName') || '（未填館名）';
+  const theme = {classic:'古典傳統風',modern:'現代專業風',zen:'禪意自然風'}[selectedTheme];
+  const modules = ['hero','about','services','product','contact','testimonial','gallery','map']
+    .filter(isModuleEnabled)
+    .map(m => ({'hero':'首頁英雄','about':'個人簡介','services':'服務項目','product':'風水能量儀','contact':'聯絡板','testimonial':'客戶見證','gallery':'作品集','map':'地圖'})[m])
+    .join('、');
+
+  document.getElementById('summary-box').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);margin-bottom:6px">大師名稱</div>
+        <div style="font-size:1.1rem;font-weight:600;color:#2d2416">${name}</div>
+      </div>
+      <div>
+        <div style="font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);margin-bottom:6px">館名</div>
+        <div style="font-size:1.1rem;color:#2d2416">${hall}</div>
+      </div>
+      <div>
+        <div style="font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);margin-bottom:6px">主題風格</div>
+        <div style="color:#2d2416">${theme}</div>
+      </div>
+      <div>
+        <div style="font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);margin-bottom:6px">電話</div>
+        <div style="color:#2d2416">${v('phone') || '（未填）'}</div>
+      </div>
+      <div style="grid-column:1/-1">
+        <div style="font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);margin-bottom:6px">啟用模組</div>
+        <div style="color:#2d2416;font-size:0.88rem">${modules}</div>
+      </div>
+    </div>`;
+}
+
+// ── HELPERS ──
+function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+// ── THEME CONFIGS ──
+const themes = {
+  classic: {
+    bg: '#0f0c07', bgMid: '#1a150a', bgDeep: '#0a0806',
+    gold: '#c9a84c', goldL: '#e8c97a', goldP: '#f5e8c0',
+    red: '#8b1a1a', parchment: '#f7f0e3', accent: '#c9a84c',
+    heroGlow: 'rgba(139,26,26,0.15)', navBg: 'rgba(15,12,7,0.92)'
+  },
+  modern: {
+    bg: '#0d1117', bgMid: '#161b22', bgDeep: '#010409',
+    gold: '#7ec8e3', goldL: '#a8d8ea', goldP: '#ceeaf3',
+    red: '#1f6feb', parchment: '#e6edf3', accent: '#7ec8e3',
+    heroGlow: 'rgba(31,111,235,0.15)', navBg: 'rgba(13,17,23,0.95)'
+  },
+  zen: {
+    bg: '#1a2a1a', bgMid: '#1e3320', bgDeep: '#111c11',
+    gold: '#8fbe6a', goldL: '#a8d588', goldP: '#d4eebc',
+    red: '#4a7a3a', parchment: '#e8f5e0', accent: '#8fbe6a',
+    heroGlow: 'rgba(74,122,58,0.2)', navBg: 'rgba(26,42,26,0.94)'
+  }
+};
+
+// ── GENERATE SITE ──
+function generateSite() {
+  const t = themes[selectedTheme];
+  const name = v('masterName') || '大師';
+  const hall = v('hallName') || name + '命理館';
+  const sub = v('subtitle') || '風水命理 ｜ 擇日開運 ｜ 陽宅鑑定';
+  const tagline = v('tagline') || '為您點亮人生格局';
+  const phone = v('phone') || '';
+  const lineId = v('lineId') || '';
+  const address = v('address') || '';
+  const hours = v('hours') || '';
+  const cert = v('cert') || '';
+  const bio1 = v('bio1') || '大師學識淵博，從事風水命理研究多年，服務廣大客戶。';
+  const bio2 = v('bio2') || '現持續開班授課，致力推廣正統堪輿文化。';
+  const stat1n = v('stat1num') || '1000+'; const stat1l = v('stat1label') || '勘察案例';
+  const stat2n = v('stat2num') || '20+';  const stat2l = v('stat2label') || '執業年資';
+  const stat3n = v('stat3num') || '98%';  const stat3l = v('stat3label') || '客戶滿意度';
+
+  const services = [];
+  for (let i = 0; i < 6; i++) {
+    const n = v(`svc${i}name`);
+    if (n) services.push({ icon: v(`svc${i}icon`) || '✦', name: n, desc: v(`svc${i}desc`) });
+  }
+
+  const photoSrc = photoDataURL || '';
+
+  const html = buildHTML(t, name, hall, sub, tagline, phone, lineId, address, hours, cert, bio1, bio2, stat1n, stat1l, stat2n, stat2l, stat3n, stat3l, services, photoSrc);
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${name}-website.html`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+
+  document.getElementById('success-box').classList.add('visible');
+  document.getElementById('success-box').scrollIntoView({ behavior: 'smooth' });
+}
+
+function buildHTML(t, name, hall, sub, tagline, phone, lineId, address, hours, cert, bio1, bio2, s1n, s1l, s2n, s2l, s3n, s3l, services, photoSrc) {
+  const servicesHTML = services.map(s => `
+    <div class="service-card">
+      <span class="service-icon">${s.icon}</span>
+      <h3 class="service-name">${s.name}</h3>
+      <p class="service-desc">${s.desc}</p>
+    </div>`).join('');
+
+  const photoHTML = photoSrc
+    ? `<img src="${photoSrc}" alt="${name}" style="width:100%;height:100%;object-fit:cover">`
+    : '<span style="font-size:5rem">🧙</span>';
+
+  const showProduct = isModuleEnabled('product');
+  const showContact = isModuleEnabled('contact');
+
+  const productSection = showProduct ? `
+  <section id="product" style="background:linear-gradient(135deg,${t.bgDeep} 0%,#1a0e0e 50%,${t.bgDeep} 100%);border-top:1px solid rgba(${hexToRgb(t.gold)},0.2);border-bottom:1px solid rgba(${hexToRgb(t.gold)},0.2);padding:100px 0">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
+        <div style="text-align:center">
+          <div style="width:260px;height:260px;margin:0 auto;background:radial-gradient(circle,rgba(139,26,26,0.3) 0%,rgba(${hexToRgb(t.gold)},0.15) 40%,transparent 70%);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:pulse 3s ease-in-out infinite;position:relative">
+            <div style="position:absolute;inset:-18px;border:1px solid rgba(${hexToRgb(t.gold)},0.3);border-radius:50%;animation:slowSpin 20s linear infinite"></div>
+            <span style="font-size:5rem">🔮</span>
+          </div>
+          <p style="margin-top:28px;font-size:0.75rem;letter-spacing:0.3em;color:${t.gold};opacity:0.7">大師親自認證推薦</p>
+        </div>
+        <div>
+          <span style="display:inline-block;font-size:0.7rem;letter-spacing:0.4em;color:${t.gold};border:1px solid rgba(${hexToRgb(t.gold)},0.4);padding:5px 16px;margin-bottom:16px">法器推薦</span>
+          <h2 style="font-family:'Ma Shan Zheng',cursive;font-size:2rem;color:${t.goldL};margin-bottom:8px;letter-spacing:0.1em">風水能量儀</h2>
+          <p style="color:${t.gold};font-size:0.8rem;letter-spacing:0.3em;margin-bottom:24px">FENG SHUI ENERGY DEVICE</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+            ${['磁場調頻','八卦加持','科學認證','全台配送'].map(b=>`<span style="padding:4px 14px;border:1px solid ${t.gold};font-size:0.72rem;letter-spacing:0.15em;color:${t.goldP}">${b}</span>`).join('')}
+          </div>
+          <p style="color:rgba(${hexToRgb(t.parchment)},0.75);font-size:0.92rem;line-height:2.2;letter-spacing:0.05em;margin-bottom:16px">
+            融合傳統八卦能量原理與現代科技，採用天然礦石與特殊波頻共振技術。大師親身試驗多年，確認其對居家磁場有顯著調整作用，可搭配風水佈局使用，強化旺氣效果。
+          </p>
+          <p style="color:rgba(${hexToRgb(t.parchment)},0.6);font-size:0.9rem;line-height:2;margin-bottom:24px">安置方位由大師依您住宅格局個別指導，效果事半功倍。</p>
+          <div style="font-family:'Ma Shan Zheng',cursive;font-size:2.2rem;color:${t.gold};margin-bottom:24px">NT$ 3,800 <span style="font-size:1rem;opacity:0.6">/ 件</span></div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a href="#contact" style="padding:14px 32px;background:${t.gold};color:${t.bg};font-size:0.88rem;letter-spacing:0.2em;text-decoration:none;font-weight:600;transition:all 0.3s">詢問大師 + 購買</a>
+            <a href="#contact" style="padding:13px 32px;background:transparent;color:${t.gold};border:1px solid ${t.gold};font-size:0.88rem;letter-spacing:0.2em;text-decoration:none;transition:all 0.3s">了解更多</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>` : '';
+
+  const contactSection = showContact ? `
+  <section id="contact" style="background:${t.bgMid};padding:100px 0">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:64px">
+        <span style="display:inline-block;font-size:0.7rem;letter-spacing:0.4em;color:${t.gold};border:1px solid rgba(${hexToRgb(t.gold)},0.4);padding:5px 16px;margin-bottom:16px">預約諮詢</span>
+        <h2 style="font-family:'Ma Shan Zheng',cursive;font-size:2.5rem;color:${t.goldL};letter-spacing:0.1em;margin-bottom:12px">與大師聯繫</h2>
+        <p style="color:rgba(${hexToRgb(t.parchment)},0.5);font-size:0.88rem;letter-spacing:0.2em">留下您的訊息，大師將盡快回覆</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:80px">
+        <div>
+          <h3 style="font-family:'Ma Shan Zheng',cursive;font-size:1.5rem;color:${t.goldL};margin-bottom:28px;letter-spacing:0.1em">聯絡資訊</h3>
+          ${phone ? contactItem('📞','預約電話',phone,t) : ''}
+          ${address ? contactItem('📍','服務地址',address,t) : ''}
+          ${hours ? contactItem('🕐','服務時間',hours,t) : ''}
+          ${lineId ? contactItem('💬','LINE 諮詢',lineId,t) : ''}
+        </div>
+        <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" style="display:flex;flex-direction:column;gap:16px">
+          ${formField('name','姓名','請輸入您的姓名',t)}
+          ${formField('phone','聯絡電話','09XX-XXX-XXX',t)}
+          ${formField('email','Email','your@email.com',t)}
+          ${formField('service','諮詢項目','如：陽宅鑑定、八字批算…',t)}
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <label style="font-size:0.72rem;letter-spacing:0.3em;color:${t.gold}">留言內容</label>
+            <textarea name="message" rows="4" placeholder="請描述您的需求…" style="background:rgba(255,255,255,0.04);border:1px solid rgba(${hexToRgb(t.gold)},0.25);color:${t.parchment};padding:12px 16px;font-family:'Noto Serif TC',serif;font-size:0.88rem;resize:none;outline:none"></textarea>
+          </div>
+          <button type="submit" style="padding:14px;background:${t.gold};color:${t.bg};font-size:0.9rem;letter-spacing:0.2em;font-weight:600;border:none;cursor:pointer">送出預約申請</button>
+        </form>
+      </div>
+    </div>
+  </section>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${name}｜${sub}</title>
+<meta name="description" content="${name}，${hall}，提供風水命理、擇日開運等專業服務。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:${t.bg};color:${t.parchment};font-family:'Noto Serif TC',serif;overflow-x:hidden}
+.container{max-width:1100px;margin:0 auto;padding:0 48px}
+nav{position:fixed;top:0;width:100%;z-index:100;background:${t.navBg};border-bottom:1px solid rgba(${hexToRgb(t.gold)},0.3);backdrop-filter:blur(8px);padding:14px 48px;display:flex;justify-content:space-between;align-items:center}
+.nav-logo{font-family:'Ma Shan Zheng',cursive;font-size:1.4rem;color:${t.gold};letter-spacing:0.15em;text-decoration:none}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{color:${t.parchment};text-decoration:none;font-size:0.82rem;letter-spacing:0.2em;transition:color 0.3s}
+.nav-links a:hover{color:${t.goldL}}
+.service-card{background:${t.bgMid};padding:40px 28px;position:relative;overflow:hidden;transition:all 0.3s;border:1px solid rgba(${hexToRgb(t.gold)},0.1)}
+.service-card:hover{border-color:rgba(${hexToRgb(t.gold)},0.4)}
+.service-icon{font-size:2.2rem;margin-bottom:16px;display:block}
+.service-name{font-family:'Ma Shan Zheng',cursive;font-size:1.3rem;color:${t.goldL};margin-bottom:10px;letter-spacing:0.1em}
+.service-desc{font-size:0.83rem;color:rgba(${hexToRgb(t.parchment)},0.6);line-height:2;letter-spacing:0.04em}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slowSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 40px rgba(${hexToRgb(t.gold)},0.12)}50%{box-shadow:0 0 80px rgba(${hexToRgb(t.gold)},0.28)}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="#" class="nav-logo">${name}</a>
+  <ul class="nav-links">
+    <li><a href="#about">大師簡介</a></li>
+    <li><a href="#services">服務項目</a></li>
+    ${showProduct ? '<li><a href="#product">推薦法器</a></li>' : ''}
+    ${showContact ? '<li><a href="#contact">預約諮詢</a></li>' : ''}
+  </ul>
+</nav>
+
+<section style="min-height:100vh;display:grid;place-items:center;position:relative;overflow:hidden;background:radial-gradient(ellipse 60% 70% at 50% 50%,${t.heroGlow} 0%,transparent 70%),${t.bgDeep}">
+  <div style="position:relative;z-index:2;text-align:center;padding:120px 24px 80px;animation:fadeUp 1.2s ease forwards">
+    ${cert ? `<p style="font-size:0.72rem;letter-spacing:0.5em;color:${t.gold};margin-bottom:24px;text-transform:uppercase">${cert}</p>` : ''}
+    <h1 style="font-family:'Ma Shan Zheng',cursive;font-size:clamp(3.5rem,10vw,7rem);color:${t.goldL};line-height:1.1;text-shadow:0 0 60px rgba(${hexToRgb(t.gold)},0.3);margin-bottom:8px;letter-spacing:0.05em">${name}</h1>
+    <p style="font-size:clamp(0.9rem,2.5vw,1.3rem);color:${t.parchment};letter-spacing:0.4em;margin-bottom:28px;font-weight:300">${sub}</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:20px auto;max-width:400px;color:${t.gold};opacity:0.5">
+      <div style="flex:1;height:1px;background:${t.gold};opacity:0.4"></div><span>✦</span><div style="flex:1;height:1px;background:${t.gold};opacity:0.4"></div>
+    </div>
+    <p style="font-size:1rem;color:rgba(${hexToRgb(t.parchment)},0.65);letter-spacing:0.25em;line-height:2;margin-bottom:48px">${tagline}</p>
+    <div style="display:inline-flex;gap:16px;flex-wrap:wrap;justify-content:center">
+      ${showContact ? `<a href="#contact" style="padding:14px 36px;background:${t.gold};color:${t.bgDeep};text-decoration:none;font-size:0.9rem;letter-spacing:0.2em;font-weight:600;transition:all 0.3s">立即預約諮詢</a>` : ''}
+      <a href="#services" style="padding:13px 36px;background:transparent;color:${t.gold};border:1px solid ${t.gold};text-decoration:none;font-size:0.9rem;letter-spacing:0.2em;transition:all 0.3s">服務項目</a>
+    </div>
+  </div>
+</section>
+
+<section id="about" style="background:${t.bgMid};padding:100px 0">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:80px;align-items:center">
+      <div style="position:relative">
+        <div style="width:100%;aspect-ratio:3/4;background:${t.bgDeep};display:flex;align-items:center;justify-content:center;border:1px solid rgba(${hexToRgb(t.gold)},0.3);overflow:hidden;position:relative">
+          ${photoSrc ? `<img src="${photoSrc}" alt="${name}" style="width:100%;height:100%;object-fit:cover">` : `<span style="font-size:5rem">🧙</span>`}
+        </div>
+        <div style="position:absolute;bottom:-18px;right:-18px;width:96px;height:96px;background:${t.red};border:2px solid ${t.gold};border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.62rem;letter-spacing:0.08em;color:${t.goldP};text-align:center;line-height:1.7">
+          <strong style="font-size:1.4rem;line-height:1;color:${t.goldL}">${s1n}</strong>${s1l}
+        </div>
+      </div>
+      <div>
+        <span style="display:inline-block;font-size:0.7rem;letter-spacing:0.4em;color:${t.gold};border:1px solid rgba(${hexToRgb(t.gold)},0.4);padding:5px 16px;margin-bottom:16px">大師簡介</span>
+        <h3 style="font-family:'Ma Shan Zheng',cursive;font-size:1.8rem;color:${t.goldL};margin-bottom:24px;letter-spacing:0.1em">${name} 大師</h3>
+        <p style="color:rgba(${hexToRgb(t.parchment)},0.8);line-height:2.2;font-size:0.94rem;letter-spacing:0.05em;margin-bottom:20px">${bio1}</p>
+        <p style="color:rgba(${hexToRgb(t.parchment)},0.8);line-height:2.2;font-size:0.94rem;letter-spacing:0.05em;margin-bottom:32px">${bio2}</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;border-top:1px solid rgba(${hexToRgb(t.gold)},0.2);padding-top:28px">
+          ${[{n:s1n,l:s1l},{n:s2n,l:s2l},{n:s3n,l:s3l}].map(s=>`<div style="text-align:center"><span style="font-family:'Ma Shan Zheng',cursive;font-size:2rem;color:${t.gold};display:block">${s.n}</span><span style="font-size:0.72rem;color:rgba(${hexToRgb(t.parchment)},0.45);letter-spacing:0.18em">${s.l}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services" style="background:${t.bg};padding:100px 0">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:60px">
+      <span style="display:inline-block;font-size:0.7rem;letter-spacing:0.4em;color:${t.gold};border:1px solid rgba(${hexToRgb(t.gold)},0.4);padding:5px 16px;margin-bottom:16px">服務項目</span>
+      <h2 style="font-family:'Ma Shan Zheng',cursive;font-size:clamp(1.8rem,4vw,2.8rem);color:${t.goldL};letter-spacing:0.1em;margin-bottom:12px">專業風水服務</h2>
+      <p style="color:rgba(${hexToRgb(t.parchment)},0.5);font-size:0.88rem;letter-spacing:0.2em">因地制宜，因人而異，為您量身規劃</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px">
+      ${servicesHTML}
+    </div>
+  </div>
+</section>
+
+${productSection}
+${contactSection}
+
+<footer style="background:${t.bgDeep};border-top:1px solid rgba(${hexToRgb(t.gold)},0.2);padding:48px 0;text-align:center">
+  <div style="font-family:'Ma Shan Zheng',cursive;font-size:1.7rem;color:${t.gold};margin-bottom:12px">${hall}</div>
+  ${cert ? `<p style="color:rgba(${hexToRgb(t.parchment)},0.3);font-size:0.75rem;letter-spacing:0.2em;margin-bottom:6px">${cert}</p>` : ''}
+  <p style="color:rgba(${hexToRgb(t.parchment)},0.25);font-size:0.75rem;letter-spacing:0.15em">© 2025 ${hall} · 版權所有</p>
+</footer>
+</body>
+</html>`;
+}
+
+function contactItem(icon, label, text, t) {
+  return `<div style="display:flex;gap:14px;margin-bottom:22px;align-items:flex-start">
+    <div style="width:38px;height:38px;border:1px solid rgba(${hexToRgb(t.gold)},0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${t.gold}">${icon}</div>
+    <div><label style="display:block;font-size:0.68rem;letter-spacing:0.3em;color:${t.gold};margin-bottom:3px">${label}</label>
+    <p style="color:rgba(${hexToRgb(t.parchment)},0.8);font-size:0.88rem;line-height:1.8">${text}</p></div>
+  </div>`;
+}
+
+function formField(name, label, ph, t) {
+  return `<div style="display:flex;flex-direction:column;gap:7px">
+    <label style="font-size:0.72rem;letter-spacing:0.3em;color:${t.gold}">${label}</label>
+    <input type="text" name="${name}" placeholder="${ph}" style="background:rgba(255,255,255,0.04);border:1px solid rgba(${hexToRgb(t.gold)},0.25);color:${t.parchment};padding:11px 14px;font-family:'Noto Serif TC',serif;font-size:0.87rem;outline:none">
+  </div>`;
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+  const n = parseInt(hex, 16);
+  return `${(n>>16)&255},${(n>>8)&255},${n&255}`;
+}
+</script>
+</body>
+</html>

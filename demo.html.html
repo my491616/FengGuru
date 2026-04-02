@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>諸葛玄機｜風水命理．擇日開運</title>
+<meta name="description" content="諸葛玄機大師，從事風水命理研究三十餘年，提供陽宅風水、命盤批算、擇日開運等專業服務。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-pale: #f5e8c0;
+    --ink: #0f0c07;
+    --ink-deep: #1a150a;
+    --ink-mid: #2d2416;
+    --red: #8b1a1a;
+    --red-accent: #c0392b;
+    --parchment: #f7f0e3;
+    --cream: #faf6ee;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: 'Noto Serif TC', serif;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.4;
+  }
+
+  /* ── DECORATIVE LINES ── */
+  .deco-line {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--gold); letter-spacing: 0.3em; font-size: 0.75rem;
+  }
+  .deco-line::before, .deco-line::after {
+    content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    background: rgba(15,12,7,0.92);
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    backdrop-filter: blur(8px);
+    padding: 14px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .nav-logo {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.5rem; color: var(--gold);
+    letter-spacing: 0.15em;
+    text-decoration: none;
+  }
+
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--parchment); text-decoration: none;
+    font-size: 0.85rem; letter-spacing: 0.2em;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px; background: var(--gold);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold-light); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid; place-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 70% at 50% 50%, rgba(139,26,26,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 100% 100% at 50% 100%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      var(--ink-deep);
+  }
+
+  /* Bagua decorative background */
+  .bagua-bg {
+    position: absolute;
+    width: 600px; height: 600px;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    opacity: 0.035;
+    animation: slowSpin 120s linear infinite;
+  }
+
+  @keyframes slowSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    text-align: center;
+    padding: 120px 24px 80px;
+    animation: fadeUp 1.2s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-eyebrow {
+    font-size: 0.75rem; letter-spacing: 0.5em; color: var(--gold);
+    margin-bottom: 24px; text-transform: uppercase;
+  }
+
+  .hero-name {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    color: var(--gold-light);
+    line-height: 1.1;
+    text-shadow: 0 0 60px rgba(201,168,76,0.3);
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .hero-title {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    color: var(--parchment);
+    letter-spacing: 0.4em;
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .hero-divider {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; margin: 24px auto; max-width: 400px;
+    color: var(--gold); opacity: 0.6;
+  }
+  .hero-divider::before, .hero-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--gold); opacity: 0.4;
+  }
+  .hero-divider span { font-size: 1.2rem; }
+
+  .hero-tagline {
+    font-size: 1.05rem; color: rgba(245,232,192,0.7);
+    letter-spacing: 0.25em; line-height: 2;
+    margin-bottom: 48px;
+  }
+
+  .hero-cta {
+    display: inline-flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+  }
+
+  .btn-primary {
+    padding: 14px 36px;
+    background: var(--gold);
+    color: var(--ink-deep);
+    border: none; cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.9rem; letter-spacing: 0.2em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+  }
+
+  .btn-outline {
+    padding: 13px 36px;
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.9rem; letter-spacing: 0.2em;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  .btn-outline:hover {
+    background: rgba(201,168,76,0.1);
+    transform: translateY(-2px);
+  }
+
+  /* ── SCROLL INDICATOR ── */
+  .scroll-hint {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--gold); opacity: 0.5; font-size: 0.7rem; letter-spacing: 0.3em;
+    animation: bounce 2s ease infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 100px 0;
+    position: relative;
+  }
+
+  .container {
+    max-width: 1100px; margin: 0 auto; padding: 0 48px;
+  }
+
+  .section-header { text-align: center; margin-bottom: 64px; }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 0.7rem; letter-spacing: 0.5em; color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 6px 20px; margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: var(--gold-light);
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+
+  .section-subtitle {
+    color: rgba(245,232,192,0.6);
+    font-size: 0.9rem; letter-spacing: 0.2em;
+    font-weight: 300;
+  }
+
+  /* ── ABOUT ── */
+  #about { background: var(--ink-mid); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 80px; align-items: center;
+  }
+
+  .about-photo-frame {
+    position: relative;
+  }
+
+  .about-photo {
+    width: 100%; aspect-ratio: 3/4;
+    background: var(--ink-deep);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem;
+    border: 1px solid rgba(201,168,76,0.3);
+    position: relative; overflow: hidden;
+  }
+
+  .about-photo::before {
+    content: '';
+    position: absolute; inset: 8px;
+    border: 1px solid rgba(201,168,76,0.15);
+    pointer-events: none;
+  }
+
+  .about-photo-corner {
+    position: absolute;
+    width: 24px; height: 24px;
+    border-color: var(--gold);
+    border-style: solid;
+    border-width: 0;
+  }
+  .about-photo-corner.tl { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; }
+  .about-photo-corner.tr { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; }
+  .about-photo-corner.bl { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; }
+  .about-photo-corner.br { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
+
+  .about-badge {
+    position: absolute; bottom: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: var(--red);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 0.65rem; letter-spacing: 0.1em; color: var(--gold-pale);
+    text-align: center; line-height: 1.6;
+  }
+  .about-badge strong { font-size: 1.5rem; line-height: 1; color: var(--gold-light); }
+
+  .about-text h3 {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.8rem; color: var(--gold-light);
+    margin-bottom: 24px; letter-spacing: 0.1em;
+  }
+
+  .about-text p {
+    color: rgba(245,232,192,0.8);
+    line-height: 2.2; font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+  }
+
+  .about-stats {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 24px; margin-top: 40px;
+    border-top: 1px solid rgba(201,168,76,0.2);
+    padding-top: 32px;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 2.2rem; color: var(--gold);
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.75rem; color: rgba(245,232,192,0.5);
+    letter-spacing: 0.2em;
+  }
+
+  /* ── SERVICES ── */
+  #services { background: var(--ink); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2px;
+  }
+
+  .service-card {
+    background: var(--ink-mid);
+    padding: 44px 32px;
+    position: relative; overflow: hidden;
+    transition: all 0.4s;
+    cursor: default;
+    border: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s;
+  }
+
+  .service-card:hover { background: rgba(45,36,22,0.8); }
+  .service-card:hover::before { transform: scaleX(1); }
+
+  .service-icon {
+    font-size: 2.4rem; margin-bottom: 20px;
+    display: block;
+  }
+
+  .service-name {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.4rem; color: var(--gold-light);
+    margin-bottom: 12px; letter-spacing: 0.1em;
+  }
+
+  .service-desc {
+    font-size: 0.85rem; color: rgba(245,232,192,0.6);
+    line-height: 2; letter-spacing: 0.05em;
+  }
+
+  /* ── PRODUCT (ENERGY DEVICE) ── */
+  #product {
+    background: linear-gradient(135deg, var(--ink-deep) 0%, #1a0e0e 50%, var(--ink-deep) 100%);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+
+  .product-visual {
+    position: relative; text-align: center;
+  }
+
+  .product-glow {
+    width: 280px; height: 280px;
+    margin: 0 auto;
+    background: radial-gradient(circle, rgba(139,26,26,0.3) 0%, rgba(201,168,76,0.15) 40%, transparent 70%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 40px rgba(201,168,76,0.15); }
+    50% { box-shadow: 0 0 80px rgba(201,168,76,0.3), 0 0 120px rgba(139,26,26,0.2); }
+  }
+
+  .product-icon-big { font-size: 5rem; }
+
+  .product-ring {
+    position: absolute; inset: -20px;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 50%;
+    animation: slowSpin 20s linear infinite;
+  }
+  .product-ring::before {
+    content: '☰';
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    font-size: 0.9rem; color: var(--gold); opacity: 0.5;
+  }
+
+  .product-badge-strip {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin: 28px 0;
+  }
+  .p-badge {
+    padding: 4px 14px;
+    border: 1px solid var(--gold);
+    font-size: 0.72rem; letter-spacing: 0.15em;
+    color: var(--gold-pale);
+  }
+
+  .product-info h2 {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 2rem; color: var(--gold-light);
+    margin-bottom: 8px; letter-spacing: 0.1em;
+    line-height: 1.3;
+  }
+
+  .product-subtitle {
+    color: var(--gold); font-size: 0.8rem; letter-spacing: 0.3em;
+    margin-bottom: 28px;
+  }
+
+  .product-desc {
+    color: rgba(245,232,192,0.75);
+    font-size: 0.92rem; line-height: 2.2;
+    letter-spacing: 0.05em; margin-bottom: 28px;
+  }
+
+  .product-price {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 2.4rem; color: var(--gold);
+    margin-bottom: 24px;
+  }
+  .product-price span { font-size: 1rem; opacity: 0.6; }
+
+  /* ── CONTACT ── */
+  #contact { background: var(--ink-mid); }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 80px;
+  }
+
+  .contact-info h3 {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.6rem; color: var(--gold-light);
+    margin-bottom: 32px; letter-spacing: 0.1em;
+  }
+
+  .contact-item {
+    display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-start;
+  }
+
+  .contact-icon {
+    width: 40px; height: 40px;
+    border: 1px solid rgba(201,168,76,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+    color: var(--gold);
+  }
+
+  .contact-item-text label {
+    display: block;
+    font-size: 0.7rem; letter-spacing: 0.3em; color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .contact-item-text p {
+    color: rgba(245,232,192,0.8); font-size: 0.9rem;
+    line-height: 1.8; letter-spacing: 0.05em;
+  }
+
+  .message-form { display: flex; flex-direction: column; gap: 16px; }
+
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+
+  .form-group label {
+    font-size: 0.72rem; letter-spacing: 0.3em; color: var(--gold);
+  }
+
+  .form-group input,
+  .form-group textarea {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.25);
+    color: var(--parchment);
+    padding: 12px 16px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.88rem;
+    letter-spacing: 0.05em;
+    transition: border-color 0.3s;
+    outline: none;
+    resize: none;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus { border-color: var(--gold); }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: rgba(245,232,192,0.25); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink-deep);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    padding: 48px 0;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.8rem; color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .footer-text {
+    color: rgba(245,232,192,0.3);
+    font-size: 0.78rem; letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    .container { padding: 0 20px; }
+    section { padding: 72px 0; }
+    .about-grid, .product-grid, .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+    .about-badge { width: 80px; height: 80px; }
+    .about-badge strong { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">諸葛玄機</a>
+  <ul class="nav-links">
+    <li><a href="#about">大師簡介</a></li>
+    <li><a href="#services">服務項目</a></li>
+    <li><a href="#product">推薦法器</a></li>
+    <li><a href="#contact">預約諮詢</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Bagua SVG background -->
+  <svg class="bagua-bg" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="150" cy="150" r="140" stroke="#c9a84c" stroke-width="1"/>
+    <circle cx="150" cy="150" r="100" stroke="#c9a84c" stroke-width="0.5"/>
+    <circle cx="150" cy="150" r="60" stroke="#c9a84c" stroke-width="1"/>
+    <!-- Trigram lines -->
+    <g stroke="#c9a84c" stroke-width="2" stroke-linecap="round">
+      <!-- 8 directions -->
+      <line x1="150" y1="10" x2="150" y2="50"/>
+      <line x1="248" y1="52" x2="220" y2="80"/>
+      <line x1="290" y1="150" x2="250" y2="150"/>
+      <line x1="248" y1="248" x2="220" y2="220"/>
+      <line x1="150" y1="290" x2="150" y2="250"/>
+      <line x1="52" y1="248" x2="80" y2="220"/>
+      <line x1="10" y1="150" x2="50" y2="150"/>
+      <line x1="52" y1="52" x2="80" y2="80"/>
+    </g>
+    <text x="150" y="158" text-anchor="middle" font-size="32" fill="#c9a84c" font-family="serif">☯</text>
+  </svg>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">中華民國地理師協會認證</p>
+    <h1 class="hero-name">諸葛玄機</h1>
+    <p class="hero-title">風水命理 ｜ 擇日開運 ｜ 陽宅鑑定</p>
+
+    <div class="hero-divider"><span>✦</span></div>
+
+    <p class="hero-tagline">
+      天時地利人和，三才合一<br>
+      三十年閱地無數，為您點亮人生格局
+    </p>
+
+    <div class="hero-cta">
+      <a href="#contact" class="btn-primary">立即預約諮詢</a>
+      <a href="#services" class="btn-outline">服務項目</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>向下探索</span>
+    <span>↓</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-photo-frame">
+        <div class="about-photo">
+          🧙
+          <div class="about-photo-corner tl"></div>
+          <div class="about-photo-corner tr"></div>
+          <div class="about-photo-corner bl"></div>
+          <div class="about-photo-corner br"></div>
+        </div>
+        <div class="about-badge">
+          <strong>30+</strong>
+          年資歷<br>認證大師
+        </div>
+      </div>
+
+      <div class="about-text">
+        <div class="section-tag">大師簡介</div>
+        <h3>諸葛玄機 大師</h3>
+        <p>
+          自幼隨祖父習學堪輿之術，深研《地理正宗》、《撼龍經》等古籍，融合現代建築與環境科學，自成一派。三十年來走遍台灣山川，勘察陽宅逾千處，以精準論斷深獲客戶信賴。
+        </p>
+        <p>
+          現任中華民國地理師協會理事，長期開班授課，致力將正統堪輿知識傳承推廣，幫助更多家庭與企業開創興旺格局。
+        </p>
+
+        <div class="about-stats">
+          <div class="stat-item">
+            <span class="stat-num">1,200+</span>
+            <span class="stat-label">勘察案例</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">30+</span>
+            <span class="stat-label">執業年資</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">98%</span>
+            <span class="stat-label">客戶滿意度</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">服務項目</span>
+      <h2 class="section-title">專業風水服務</h2>
+      <p class="section-subtitle">因地制宜，因人而異，為您量身規劃</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <span class="service-icon">🏠</span>
+        <h3 class="service-name">陽宅風水鑑定</h3>
+        <p class="service-desc">住宅、辦公室、廠房等空間勘察，格局分析、化煞佈局，打造旺氣聚財的居住環境。</p>
+      </div>
+
+      <div class="service-card">
+        <span class="service-icon">📿</span>
+        <h3 class="service-name">八字命盤批算</h3>
+        <p class="service-desc">依出生年月日時推算個人命盤，分析財運、事業、感情走勢，提供未來五至十年運勢規劃。</p>
+      </div>
+
+      <div class="service-card">
+        <span class="service-icon">📅</span>
+        <h3 class="service-name">擇日開運服務</h3>
+        <p class="service-desc">婚禮、開幕、動土、安床等重要日期精選，配合個人八字擇取最吉利時辰，趨吉避凶。</p>
+      </div>
+
+      <div class="service-card">
+        <span class="service-icon">🧧</span>
+        <h3 class="service-name">姓名學鑑定</h3>
+        <p class="service-desc">依三才五格理論分析姓名吉凶，為新生兒命名或成人改名，文字筆劃與命格相生相輔。</p>
+      </div>
+
+      <div class="service-card">
+        <span class="service-icon">🏢</span>
+        <h3 class="service-name">店面開業佈局</h3>
+        <p class="service-desc">商業空間風水規劃，收銀台方位、神明廳設置、文昌位利用，助您生意興隆財源滾滾。</p>
+      </div>
+
+      <div class="service-card">
+        <span class="service-icon">🌐</span>
+        <h3 class="service-name">線上視訊鑑定</h3>
+        <p class="service-desc">無法親赴現場者，可透過照片與視訊進行遠端鑑定，全台服務不受地域限制。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT - 風水能量儀 -->
+<section id="product">
+  <div class="container">
+    <div class="product-grid">
+      <div class="product-visual">
+        <div class="product-glow">
+          <div class="product-ring"></div>
+          <span class="product-icon-big">🔮</span>
+        </div>
+        <p style="margin-top:32px;font-size:0.75rem;letter-spacing:0.3em;color:var(--gold);opacity:0.7">大師親自認證推薦</p>
+      </div>
+
+      <div class="product-info">
+        <div class="section-tag">法器推薦</div>
+        <h2>風水能量儀</h2>
+        <p class="product-subtitle">FENG SHUI ENERGY DEVICE · 大師認證</p>
+
+        <div class="product-badge-strip">
+          <span class="p-badge">磁場調頻</span>
+          <span class="p-badge">八卦加持</span>
+          <span class="p-badge">科學認證</span>
+          <span class="p-badge">全台配送</span>
+        </div>
+
+        <p class="product-desc">
+          融合傳統八卦能量原理與現代科技，採用天然礦石與特殊波頻共振技術。大師親身試驗多年，確認其對居家磁場有顯著調整作用，可搭配風水佈局使用，強化旺氣效果。
+        </p>
+        <p class="product-desc">
+          安置方位由大師依您住宅格局個別指導，效果事半功倍。
+        </p>
+
+        <div class="product-price">
+          NT$ 3,800 <span>/ 件</span>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="#contact" class="btn-primary">詢問大師 + 購買</a>
+          <a href="#contact" class="btn-outline">了解更多</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">預約諮詢</span>
+      <h2 class="section-title">與大師聯繫</h2>
+      <p class="section-subtitle">留下您的訊息，大師將盡快回覆</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>聯絡資訊</h3>
+
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div class="contact-item-text">
+            <label>預約電話</label>
+            <p>0912-345-678</p>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div class="contact-item-text">
+            <label>服務地址</label>
+            <p>台北市大安區忠孝東路四段<br>XX號XX樓（近忠孝敦化站）</p>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div class="contact-item-text">
+            <label>服務時間</label>
+            <p>週一至週六 10:00 - 18:00<br>週日及國定假日 須預約</p>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">💬</div>
+          <div class="contact-item-text">
+            <label>LINE 諮詢</label>
+            <p>@master-zhuge</p>
+          </div>
+        </div>
+      </div>
+
+      <form class="message-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="form-group">
+          <label>姓名</label>
+          <input type="text" name="name" placeholder="請輸入您的姓名" required>
+        </div>
+        <div class="form-group">
+          <label>聯絡電話</label>
+          <input type="tel" name="phone" placeholder="09XX-XXX-XXX">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label>諮詢項目</label>
+          <input type="text" name="service" placeholder="如：陽宅鑑定、八字批算…">
+        </div>
+        <div class="form-group">
+          <label>留言內容</label>
+          <textarea name="message" rows="4" placeholder="請描述您的需求，大師將盡快回覆…"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;text-align:center;display:block">送出預約申請</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">諸葛玄機命理館</div>
+  <p class="footer-text">中華民國地理師協會會員 · 執業三十年</p>
+  <p class="footer-text" style="margin-top:8px">© 2025 諸葛玄機命理館 · 版權所有</p>
+</footer>
+
+</body>
+</html>
